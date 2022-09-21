@@ -4,9 +4,72 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <title>Document</title>
 </head>
 <body>
-    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <!--STEP 2:  ADD A DARK NAVBAR HERE WITH A LINK TO A SEPARATE SIGN UP PAGE -->
+        <div class="container-fluid">
+  
+          <a class="navbar-brand" href="#">Cryptotora</a>
+  
+          <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
+            <li class="nav-item"> 
+                <a class="nav-link" href="ResearchMain.html">Main Research</a>
+            </li>
+              <li class="nav-item"> 
+                <a class="nav-link" href="RootCauses.html">Root Causes</a>
+              </li>
+              <li class="nav-item"> 
+                <a class="nav-link active" href="InitialResearch.html">Initial Research</a>
+              </li>
+              <li class="nav-item"> 
+                <a class="nav-link" href="CaseStudy.html">Case Study</a>
+              </li>
+            </ul> 
+            <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-secondary" type="submit">Search</button>
+            </form>
+          </div>
+        </div>
+      </nav>
+
+<!-- STEP TWO: CUSTOMIZE THE LOOK-->
+<!-- Make adjustments to the display size, text color, background color, border, text alignment, etc... -->
+<!-- Use 4 different types of bootstrap classes -->
+<!-- The best way to do this is to search using the navbar. Put in a term OR a class tag -->
+<!-- A few pages that should be helpful to start out with.... 
+  Use https://getbootstrap.com/docs/5.2/content/typography/ to adjust the display (size, etc)
+  Use https://getbootstrap.com/docs/5.2/customize/color/ to adjust color attributes 
+  (there's also different pages with background color, opacity, etc )-->  
+  <div class="container text-center bg-dark p-5 m-3 border border-info">
+    <!-- To begin to understand how the following "grid" works, check out this link. This is the code we have below
+    https://getbootstrap.com/docs/5.2/layout/grid/#equal-width  -->
+        <div class="row">
+          <div class="col">
+            <p class="text-light">Problem Statement</p>
+          </div>
+          <div class="col">
+            <p class="text-light">Need Statement</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col border border-info">
+            <p class="text-light">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quae praesentium asperiores nulla ut repudiandae nostrum dignissimos. Ducimus quod vel, eius cupiditate ullam quia minima eaque esse illum, similique, earum quos!</p>
+          </div>
+          <div class="col-md-1"></div>
+          <div class="col border border-warning">
+            <p class="text-light">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos quasi, officia aspernatur id dignissimos provident inventore obcaecati maxime, similique asperiores ullam saepe, aut nesciunt minima facere quisquam. Nobis, optio similique.</p>
+          </div>
+          <div class="col-md-1"></div>
+          <div class="col border border-info">
+            <p class="text-light">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quas delectus perferendis cupiditate maiores laudantium dolorum fugit, consequatur, corrupti atque debitis enim necessitatibus facere earum dicta aspernatur. Nisi ut mollitia possimus.</p>
+          </div>
+        </div>
+      </div>
 </body>
 </html>
