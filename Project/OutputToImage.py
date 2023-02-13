@@ -43,7 +43,7 @@ def ImgDra (ImgSiz, DLR, U, E, NewIm, PointList, TriangleList):
         #First triangle (Top left)
         ImgDraw.polygon(((0,0),(0,26),(15,26)),fill=(255,255,255),outline=None)
         TriangleList.append( [[(0,0),(0,26),(15,26)],(255,255,255)] )
-        PointList.append( [(0,0), ((30,0),(0,26),(15,26))] )
+        PointList.append( [ (0,0), [(30,0),(0,26),(15,26)] ] )
 
         # ROW CREATE
         NewIm = RowCre (ImgSiz,DLR,E,U,NewIm,PointList,TriangleList)
@@ -51,7 +51,7 @@ def ImgDra (ImgSiz, DLR, U, E, NewIm, PointList, TriangleList):
         # Top right corner  
         ImgDraw.polygon((((ImgSiz*30),0),((ImgSiz*30),26),((ImgSiz*30-15),26)),fill=(255,255,255),outline=None)
         TriangleList.append( [[((ImgSiz*30),0),((ImgSiz*30),26),((ImgSiz*30-15),26)], (255,255,255)] )
-        PointList.append( [((ImgSiz*30),0), (((ImgSiz*30),26),((ImgSiz*30-15),26),((ImgSiz*30-30),0))] )
+        PointList.append( [ ((ImgSiz*30),0), [((ImgSiz*30),26),((ImgSiz*30-15),26),((ImgSiz*30-30),0)] ] )
     else:
         if U == False:
             # Front side edge creation (up)
