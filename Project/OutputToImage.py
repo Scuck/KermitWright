@@ -6,6 +6,8 @@ def CreImg (ImgSiz):
     ImgDraw = ImageDraw.Draw(NewIm)
     global TriangleList
     TriangleList = []
+    global PointList
+    PointList = []
     # Point dict is a dictionary of all points which can be warped to change the grid shape
     # Triangle dict is a dictionary of all triangles and their color
     # TID is Triangle ID, PID is point ID
@@ -33,53 +35,50 @@ def CreImg (ImgSiz):
             else:
                 U = False
 
-    PointList = PointListCre(TriangleList)
+    print(TriangleList)
+    PointList = PointListCre(PointList)
     for triangle in TriangleList:
         ImgDraw.polygon((triangle[0]),(triangle[1]),outline=None)
-    ImgDraw.polygon((PointList[18][1]),(0,0,0),outline=None)
+    ImgDraw.polygon((PointList[57][1]),(0,0,0),outline=None)
+
 
     return(NewIm)
 
 def ImgDra (ImgSiz, DLR, U, E, NewIm):
-    ImgDraw = ImageDraw.Draw(NewIm)
+    PointList = []
     # U is upright, E is even, DLR is draw location row
 
     if DLR == 0:
         #First triangle (Top left)
-        # ImgDraw.polygon(((0,0),(0,26),(15,26)),fill=(255,255,255),outline=None)
-        TriangleList.append( [[(0,0),(0,26),(15,26)],(255,255,255)] )
+        TriangleCre([(0,0),(0,26),(15,26)],(255,255,255),PointList,TriangleList)
 
         # ROW CREATE
         NewIm = RowCre (ImgSiz,DLR,E,U,NewIm,TriangleList)
 
         # Top right corner  
-        # ImgDraw.polygon((((ImgSiz*30),0),((ImgSiz*30),26),((ImgSiz*30-15),26)),fill=(255,255,255),outline=None)
-        TriangleList.append( [[((ImgSiz*30),0),((ImgSiz*30),26),((ImgSiz*30-15),26)], (255,255,255)] )
+        TriangleCre([((ImgSiz*30),0),((ImgSiz*30),26),((ImgSiz*30-15),26)],(255,255,255),PointList,TriangleList)
     else:
         if U == False:
             # Front side edge creation (up)
-            # ImgDraw.polygon(((0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26))),fill=(200,200,200),outline=None)
-            TriangleList.append( [[(0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26))], (200,200,200)] )
+            TriangleCre([(0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26))],(200,200,200),PointList,TriangleList)
 
             # ROW CREATE
             NewIm = RowCre (ImgSiz,DLR,E,U,NewIm,TriangleList)
 
             # Back side edge creation (w/ front as up)
-            # ImgDraw.polygon((((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26))),fill=(200,200,200),outline=None)
-            TriangleList.append( [[((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26))], (200,200,200)] )
+            TriangleCre([((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26))],(200,200,200),PointList,TriangleList)
 
         else:
             # Front side edge creation (down)
-            # ImgDraw.polygon(((0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26)+26)),fill=(255,255,255),outline=None)
-            TriangleList.append( [[(0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26)+26)], (255,255,255)] )
+            TriangleCre([(0,(DLR*26)),(0,(DLR*26)+26),(15,(DLR*26)+26)],(255,255,255),PointList,TriangleList)
+
             
             # ROW CREATE
             NewIm = RowCre (ImgSiz,DLR,E,U,NewIm,TriangleList)
             
             # Back side creation (w/ front as down)
-            # ImgDraw.polygon((((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26)+26)),fill=(255,255,255),outline=None)
-            TriangleList.append( [[((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26)+26)], (255,255,255)] )
-    
+            TriangleCre([((30*ImgSiz),(DLR*26)),((30*ImgSiz),(DLR*26)+26),((30*ImgSiz)-15,(DLR*26)+26)],(255,255,255),PointList,TriangleList)
+
     return(TriangleList)
 
 def RowCre (ImgSiz, DLR, E, U, NewIm, TriangleList):
@@ -92,38 +91,32 @@ def RowCre (ImgSiz, DLR, E, U, NewIm, TriangleList):
     while i < ImgSiz:
         # draw triangles here
         if U == True:
-            # ImgDraw.polygon(((i*30,RT),(i*30+15,RB),(i*30+30,RT)),fill=(200,200,200),outline=None)
-            TriangleList.append( [[(i*30,RT),(i*30+15,RB),(i*30+30,RT)], (200,200,200)] )
+            TriangleCre([(i*30,RT),(i*30+15,RB),(i*30+30,RT)],(200,200,200),PointList,TriangleList)
+
             if E == True or (E == False and i+1 != ImgSiz):
-                # ImgDraw.polygon(((i*30+15,RB),(i*30+30,RT),(i*30+45,RB)),fill=(255,255,255),outline=None)
-                TriangleList.append( [[(i*30+15,RB),(i*30+30,RT),(i*30+45,RB)], (255,255,255)] )
+                TriangleCre([(i*30+15,RB),(i*30+30,RT),(i*30+45,RB)],(255,255,255),PointList,TriangleList)
+
         else:
-            # ImgDraw.polygon(((i*30,RB),(i*30+15,RT),(i*30+30,RB)),fill=(255,255,255),outline=None)
-            TriangleList.append( [[(i*30,RB),(i*30+15,RT),(i*30+30,RB)], (255,255,255)] )
+            TriangleCre([(i*30,RB),(i*30+15,RT),(i*30+30,RB)],(255,255,255),PointList,TriangleList)
             if E == True or (E == False and i+1 != ImgSiz):
-                # ImgDraw.polygon(((i*30+15,RT),(i*30+30,RB),(i*30+45,RT)),fill=(200,200,200),outline=None)
-                TriangleList.append( [[(i*30+15,RT),(i*30+30,RB),(i*30+45,RT)], (200,200,200)] )
+                TriangleCre([(i*30+15,RT),(i*30+30,RB),(i*30+45,RT)],(200,200,200),PointList,TriangleList)
         i+=1
     return(NewIm)
 
-def PointListCre(TriangleList):
-    PointList = []
+def TriangleCre( CoordsList,Color,PointList,TriangleList ):
+    for point in CoordsList:
+        ToAppend = point
+        RelsList = []
+        # iterates through the points in the same triangle again
+        for othpoint in CoordsList:
+            # discards the point that is currently being appended
+            if othpoint != point:
+                RelsList.append(othpoint)
+        PointList.append( [ToAppend,RelsList,[]] )
+        PointList[-1][2].append(len(TriangleList))
+    TriangleList.append([CoordsList,Color])
 
-    # adds every instance of every point and all relations
-
-    # iterates through triangles in triangle list
-    for triangle in TriangleList:
-        # iterates through points in triangle
-        for point in triangle[0]:
-            ToAppend = point
-            RelsList = []
-            # iterates through the points in the same triangle again
-            for othpoint in triangle[0]:
-                # discards the point that is currently being appended
-                if othpoint != point:
-                    RelsList.append(othpoint)
-            PointList.append( [ToAppend,RelsList] )
-    
+def PointListCre(PointList):    
     # creates a list of the locations of points
     PointIndexList = []
     for point in PointList:
@@ -143,16 +136,17 @@ def PointListCre(TriangleList):
         TempPointList.append( [pointloc,[]] )
 
     # adds point relations to scaffolding
+    ADD THE INDICES OF THE TRIANGLES THE POINT IS IN HERE
     for PointInfo in TempPointList:
         for point in PointList:
             if PointInfo[0] == point[0]:
-                PointRelList = []
                 for pointrel in point[1]:
                     PointInfo[1].append(pointrel)
 
     PointList = TempPointList
 
     # removes repeated related points in each point
+    REMOVE REPEATED TRIANGLE INDICES HERE
     for pointinfo in PointList:
         TempRelationsList = []
         for relpoint in pointinfo[1]:
@@ -162,24 +156,4 @@ def PointListCre(TriangleList):
         
     return(PointList)
 
-def TriangleListRefine(TriangleList, PointList):
-    # iterates through triangles in triangle list
-    for triangle in TriangleList:
-        # iterates through the points in each triangle
-        for point in triangle:
-            # iterates through all points in pointlist
-            i=0
-            TriPointList = []
-            while i<len.PointList:
-                # looks for points present in triangle in the full points list
-                if point == PointList[i]:
-                    # notes index of points
-                    TriPointList.append(i)
-                i+=1
-            #adds index of all points in the triangle to the triangle in the triangle list
-            triangle.append(TriPointList)
-    return(TriangleList)
-
-
-
-CreImg(4).show()
+CreImg(25).show()
