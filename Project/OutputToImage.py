@@ -35,12 +35,9 @@ def CreImg (ImgSiz):
             else:
                 U = False
 
-    print(TriangleList)
     PointList = PointListCre(PointList)
     for triangle in TriangleList:
         ImgDraw.polygon((triangle[0]),(triangle[1]),outline=None)
-    ImgDraw.polygon((PointList[57][1]),(0,0,0),outline=None)
-
 
     return(NewIm)
 
@@ -133,20 +130,20 @@ def PointListCre(PointList):
     # Makes list scaffolding
     TempPointList = []
     for pointloc in TruePointListReference:
-        TempPointList.append( [pointloc,[]] )
+        TempPointList.append( [pointloc,[],[]] )
 
     # adds point relations to scaffolding
-    ADD THE INDICES OF THE TRIANGLES THE POINT IS IN HERE
     for PointInfo in TempPointList:
         for point in PointList:
             if PointInfo[0] == point[0]:
                 for pointrel in point[1]:
                     PointInfo[1].append(pointrel)
+                # adds triangle relations (there is only 1 triangle in each triangle instance, so you only need to append the 1)
+                PointInfo[2].append(point[2][0])
 
     PointList = TempPointList
 
     # removes repeated related points in each point
-    REMOVE REPEATED TRIANGLE INDICES HERE
     for pointinfo in PointList:
         TempRelationsList = []
         for relpoint in pointinfo[1]:
@@ -156,4 +153,4 @@ def PointListCre(PointList):
         
     return(PointList)
 
-CreImg(25).show()
+CreImg(12).show()
