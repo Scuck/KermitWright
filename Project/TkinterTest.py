@@ -6,6 +6,7 @@ from PIL import ImageTk as itk, Image, ImageDraw
 FClickCo = [0,0]
 SClickCo = [0,0]
 ClickQ = True
+ToolSelected = 'Warp'
 
 Win1 = Tk()
 Win1.geometry("800x800")
@@ -187,29 +188,54 @@ def CursorFind(event):
     global FClickCo 
     global SClickCo 
     global ClickQ 
-    global PointSelected
-    if ClickQ == True:
-        FClickCo = (event.x , event.y)
-        ClickQ = False
-        PointSelected = PointSelect(FClickCo)
-    else:
-        SClickCo = (event.x , event.y)
-        ClickQ = True
-        for triangle in PointSelected[2]:
-            TriInd = 0
-            for point in TriangleList[triangle][0]:
-                if point == PointSelected[0]:
-                    TriangleList[triangle][0][TriInd] = SClickCo
-                TriInd += 1
-        DispImg = itk.PhotoImage(ImgRender())
-        DispBox.configure(image=DispImg)
-        DispBox.image=DispImg
-        DispBox.pack()
+    global PointSelectData
+    if ToolSelected == 'Warp':
+        if ClickQ == True:
+            FClickCo = (event.x , event.y)
+            PointSelectData = PointSelect(FClickCo)
+            if PointSelectData != None:
+                ClickQ = False
+        elif ClickQ == False:
+            PointSelected = PointSelectData[0]
+            PointSelectedInd = PointSelectData[1]
+            SClickCo = (event.x , event.y)
+            ClickQ = True
+            for triangle in PointSelected[2]:
+                TriInd = 0
+                for point in TriangleList[triangle][0]:
+                    if point == PointSelected[0]:
+                        TriangleList[triangle][0][TriInd] = SClickCo
+                    TriInd += 1
+            PointList[PointSelectedInd][0] = SClickCo
+            DispImg = itk.PhotoImage(ImgRender())
+            DispBox.configure(image=DispImg)
+            DispBox.image=DispImg
+            DispBox.pack()
+    elif ToolSelected == 'Color':
+        CClickCo = (event.x , event.y)
+        try:
+            ColorSelected = (int(CSRed.get()),int(CSGreen.get()),int(CSBlue.get()))
+        except:
+            ColorSelected = (0,0,0)
+        for triangle in TriangleList:
+            TTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - triangle[0][1][1] ) )
+            FTriArea = abs( CClickCo[0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - CClickCo[1] ) + triangle[0][2][0] * (CClickCo[1] - triangle[0][1][1] ) )
+            STriArea = abs( triangle[0][0][0] * ( CClickCo[1] - triangle[0][2][1] ) + CClickCo[0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - CClickCo[1] ) )
+            ThTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - CClickCo[1] ) + triangle[0][1][0] * ( CClickCo[1] - triangle[0][0][1] ) + CClickCo[0] * (triangle[0][0][1] - triangle[0][1][1] ) )
+            if TTriArea >= (FTriArea + STriArea + ThTriArea):
+                triangle[1] = ColorSelected
+            DispImg = itk.PhotoImage(ImgRender())
+            DispBox.configure(image=DispImg)
+            DispBox.image=DispImg
+            DispBox.pack()
+        
+
 
 def PointSelect(ClickCo):
     for point in PointList:
-        if ((((ClickCo[0]-point[0][0])**2+(ClickCo[1]-point[0][1])**2)**(1/2)))<8:
-            return(point)
+        if ((((ClickCo[0]-point[0][0])**2+(ClickCo[1]-point[0][1])**2)**(1/2)))<5:
+            return(point,PointList.index(point))
+
 
 # Image Creation Specs
 ImgCreSiz = Entry(Win1)
@@ -236,6 +262,27 @@ def PreImgCre():
 
 ImgCreFin = Button(Win1, text='Generate Image', command=PreImgCre)
 ImgCreFin.pack()
+
+# Image Coloring Specs
+ColorSpecs = Frame(Win1)
+CSRed = Entry(ColorSpecs)
+CSGreen = Entry(ColorSpecs)
+CSBlue = Entry(ColorSpecs)
+ColorSpecs.pack()
+CSRed.pack(side=LEFT)
+CSGreen.pack(side=LEFT)
+CSBlue.pack(side=LEFT)
+
+# Create Tool Selection Button
+def ToolSelect():
+    global ToolSelected
+    if ToolSelected == 'Color':
+        ToolSelected = 'Warp'
+    else:
+        ToolSelected = 'Color'
+    
+ToolSwitch = Button(Win1, text='Switch Tools', command=ToolSelect)
+ToolSwitch.pack()
 
 # Make it Work
 Win1.mainloop()
