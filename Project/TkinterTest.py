@@ -184,32 +184,42 @@ def ImgRender():
 
 # CLICKABLE FISH!!!!!
 def CursorFind(event):
-    global FClickCo 
-    global SClickCo 
-    global ClickQ 
-    global PointSelected
-    if ClickQ == True:
-        FClickCo = (event.x , event.y)
-        ClickQ = False
-        PointSelected = PointSelect(FClickCo)
-    else:
-        SClickCo = (event.x , event.y)
-        ClickQ = True
-        for triangle in PointSelected[2]:
-            TriInd = 0
-            for point in TriangleList[triangle][0]:
-                if point == PointSelected[0]:
-                    TriangleList[triangle][0][TriInd] = SClickCo
-                TriInd += 1
-        DispImg = itk.PhotoImage(ImgRender())
-        DispBox.configure(image=DispImg)
-        DispBox.image=DispImg
-        DispBox.pack()
+    try:
+        global FClickCo 
+        global SClickCo 
+        global ClickQ 
+        global PointSelectOut
+        if ClickQ == True:
+            FClickCo = (event.x , event.y)
+            PointSelectOut = PointSelect(FClickCo)
+            if PointSelectOut != None:
+                ClickQ = False
+        else:
+            PointSelected = PointSelectOut[0]
+            PointSelectedInd = PointSelectOut[1]
+            SClickCo = (event.x , event.y)
+            ClickQ = True
+            for triangle in PointSelected[2]:
+                TriInd = 0
+                for point in TriangleList[triangle][0]:
+                    print(point,PointSelected[0])
+                    if point == PointSelected[0]:
+                        TriangleList[triangle][0][TriInd] = SClickCo
+                    TriInd += 1
+            PointList[PointSelectedInd][0] = SClickCo
+            DispImg = itk.PhotoImage(ImgRender())
+            DispBox.configure(image=DispImg)
+            DispBox.image=DispImg
+            DispBox.pack()
+    except:
+        pass
 
 def PointSelect(ClickCo):
+    i=0
     for point in PointList:
         if ((((ClickCo[0]-point[0][0])**2+(ClickCo[1]-point[0][1])**2)**(1/2)))<8:
-            return(point)
+            return(point,i)
+        i+=1
 
 # Image Creation Specs
 ImgCreSiz = Entry(Win1)
