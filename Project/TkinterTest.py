@@ -1,7 +1,9 @@
 from tkinter import *
-from tkinter import messagebox
+from tkinter import colorchooser
 from tkinter.ttk import *
 from PIL import ImageTk as itk, Image, ImageDraw
+import copy
+import os
 
 FClickCo = [0,0]
 SClickCo = [0,0]
@@ -53,7 +55,7 @@ def CreImg (ImgSiz):
             else:
                 U = False
 
-    PointList = PointListCre(PointList)
+    PointList = PointListCre(PointList,ImgSiz)
 
     ImgDraw = ImageDraw.Draw(NewIm)
     for triangle in TriangleList:
@@ -131,7 +133,7 @@ def TriangleCre( CoordsList,Color,PointList,TriangleList ):
         PointList[-1][2].append(len(TriangleList))
     TriangleList.append([CoordsList,Color])
 
-def PointListCre(PointList):    
+def PointListCre(PointList,ImgSiz):    
     # creates a list of the locations of points
     PointIndexList = []
     for point in PointList:
@@ -161,13 +163,19 @@ def PointListCre(PointList):
 
     PointList = TempPointList
 
-    # removes repeated related points in each point
+    # Final proccessing 
     for pointinfo in PointList:
+        # removes repeated related points in each point
         TempRelationsList = []
         for relpoint in pointinfo[1]:
             if relpoint not in TempRelationsList:
                 TempRelationsList.append(relpoint)
         pointinfo[1] = TempRelationsList
+
+        if pointinfo[0][0] <= 16 or pointinfo[0][0] >= (ImgSiz*30)-16:
+            pointinfo.append(True)
+        else:
+            pointinfo.append(False)
         
     return(PointList)
 
@@ -185,105 +193,201 @@ def ImgRender():
 
 # CLICKABLE FISH!!!!!
 def CursorFind(event):
-    global FClickCo 
-    global SClickCo 
+    global LastTriangleList
+    global LastPointList
     global ClickQ 
     global PointSelectData
+    global ToolSelected
+    ClickCo = (event.x , event.y)
     if ToolSelected == 'Warp':
         if ClickQ == True:
-            FClickCo = (event.x , event.y)
-            PointSelectData = PointSelect(FClickCo)
+            PointSelectData = PointSelect(ClickCo)
             if PointSelectData != None:
                 ClickQ = False
         elif ClickQ == False:
+            LastTriangleList = copy.deepcopy(TriangleList)
+            LastPointList = copy.deepcopy(PointList)
             PointSelected = PointSelectData[0]
             PointSelectedInd = PointSelectData[1]
-            SClickCo = (event.x , event.y)
             ClickQ = True
             for triangle in PointSelected[2]:
                 TriInd = 0
                 for point in TriangleList[triangle][0]:
                     if point == PointSelected[0]:
-                        TriangleList[triangle][0][TriInd] = SClickCo
+                        TriangleList[triangle][0][TriInd] = ClickCo
                     TriInd += 1
-            PointList[PointSelectedInd][0] = SClickCo
+            PointList[PointSelectedInd][0] = ClickCo
             DispImg = itk.PhotoImage(ImgRender())
             DispBox.configure(image=DispImg)
             DispBox.image=DispImg
             DispBox.pack()
     elif ToolSelected == 'Color':
-        CClickCo = (event.x , event.y)
-        try:
-            ColorSelected = (int(CSRed.get()),int(CSGreen.get()),int(CSBlue.get()))
-        except:
-            ColorSelected = (0,0,0)
+        LastTriangleList = copy.deepcopy(TriangleList)
+        LastPointList = copy.deepcopy(PointList)
+        global ColorSelected
         for triangle in TriangleList:
             TTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - triangle[0][1][1] ) )
-            FTriArea = abs( CClickCo[0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - CClickCo[1] ) + triangle[0][2][0] * (CClickCo[1] - triangle[0][1][1] ) )
-            STriArea = abs( triangle[0][0][0] * ( CClickCo[1] - triangle[0][2][1] ) + CClickCo[0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - CClickCo[1] ) )
-            ThTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - CClickCo[1] ) + triangle[0][1][0] * ( CClickCo[1] - triangle[0][0][1] ) + CClickCo[0] * (triangle[0][0][1] - triangle[0][1][1] ) )
+            FTriArea = abs( ClickCo[0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - ClickCo[1] ) + triangle[0][2][0] * (ClickCo[1] - triangle[0][1][1] ) )
+            STriArea = abs( triangle[0][0][0] * ( ClickCo[1] - triangle[0][2][1] ) + ClickCo[0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - ClickCo[1] ) )
+            ThTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - ClickCo[1] ) + triangle[0][1][0] * ( ClickCo[1] - triangle[0][0][1] ) + ClickCo[0] * (triangle[0][0][1] - triangle[0][1][1] ) )
             if TTriArea >= (FTriArea + STriArea + ThTriArea):
                 triangle[1] = ColorSelected
             DispImg = itk.PhotoImage(ImgRender())
             DispBox.configure(image=DispImg)
             DispBox.image=DispImg
             DispBox.pack()
-        
-
+    elif ToolSelected == 'Eyedrop':
+        for triangle in TriangleList:
+            TTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - triangle[0][1][1] ) )
+            FTriArea = abs( ClickCo[0] * ( triangle[0][1][1] - triangle[0][2][1] ) + triangle[0][1][0] * ( triangle[0][2][1] - ClickCo[1] ) + triangle[0][2][0] * (ClickCo[1] - triangle[0][1][1] ) )
+            STriArea = abs( triangle[0][0][0] * ( ClickCo[1] - triangle[0][2][1] ) + ClickCo[0] * ( triangle[0][2][1] - triangle[0][0][1] ) + triangle[0][2][0] * (triangle[0][0][1] - ClickCo[1] ) )
+            ThTriArea = abs( triangle[0][0][0] * ( triangle[0][1][1] - ClickCo[1] ) + triangle[0][1][0] * ( ClickCo[1] - triangle[0][0][1] ) + ClickCo[0] * (triangle[0][0][1] - triangle[0][1][1] ) )
+            if TTriArea >= (FTriArea + STriArea + ThTriArea):
+                ColorSelected = triangle[1]
+                ToolSelected = 'Color'
+                ToolSelectedDisp.config(text='Color')
 
 def PointSelect(ClickCo):
-    i=0
     for point in PointList:
-        if ((((ClickCo[0]-point[0][0])**2+(ClickCo[1]-point[0][1])**2)**(1/2)))<5:
+        if ((((ClickCo[0]-point[0][0])**2+(ClickCo[1]-point[0][1])**2)**(1/2)))<5 and point[3] == False:
             return(point,PointList.index(point))
 
-
-# Image Creation Specs
-ImgCreSiz = Entry(Win1)
-ImgCreSiz.pack()
+SideBar = Panedwindow(Win1)
+SideBar.pack(side=LEFT,fill='y')
 
 # Create Image Frame
 ImgBox = Frame(Win1,width=600,height=600)
 ImgBox.pack()
 ImgBox.place(anchor='center', relx=0.5, rely=0.5)
 
-DispBox = Label(ImgBox,image= DefaultImg) 
+DispBox = Label(ImgBox,image= DefaultImg)
 DispBox.bind("<Button-1>", CursorFind)
 DispBox.pack()
 
-# create button that generates a new image
+# Requests new image creation
 def PreImgCre():
     try:
-        DispImgPil = CreImg(int(ImgCreSiz.get()))
+        global ImgSiz
+        ImgSiz = int(ImgCreSiz.get())
+        DispImgPil = CreImg(ImgSiz)
         DispImg = itk.PhotoImage(DispImgPil)
         DispBox.configure(image=DispImg)
         DispBox.image=DispImg
     except ValueError:
         pass
 
-ImgCreFin = Button(Win1, text='Generate Image', command=PreImgCre)
+# Image Creation button stuff
+ImgCreFin = Button(SideBar, text='Create Img', command=PreImgCre)
 ImgCreFin.pack()
+ImgCreSiz = Entry(SideBar)
+ImgCreSiz.pack()
 
-# Image Coloring Specs
-ColorSpecs = Frame(Win1)
-CSRed = Entry(ColorSpecs)
-CSGreen = Entry(ColorSpecs)
-CSBlue = Entry(ColorSpecs)
-ColorSpecs.pack()
-CSRed.pack(side=LEFT)
-CSGreen.pack(side=LEFT)
-CSBlue.pack(side=LEFT)
+#Image Save stuff
 
-# Create Tool Selection Button
-def ToolSelect():
+def Save():
+    if len(ImgSaveName.get()) > 0:
+        Cont = True
+        ImgNames = open('Project\ImgSaves\ImgNames','r')
+        AllImgNames = []
+        for line in ImgNames:
+            correctline = line.replace('\n','')
+            AllImgNames.append(correctline)
+            if correctline == ImgSaveName.get():
+                Cont = False
+        ImgNames.close()
+        
+        if Cont == True:
+            ImgNames = open('Project\ImgSaves\ImgNames','a')
+            ImgNames.write(str(ImgSaveName.get()))
+            ImgNames.write('\n')
+
+            ImgSaveFullName = ImgSaveName.get()+".txt"
+            ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
+            # assert os.path.isfile(ImgPath)
+            AllImgData = (PointList,TriangleList)
+            ImgSaves = open(ImgPath,'w+')
+            ImgSaves.write(str(ImgSiz))
+            ImgSaves.write('\n')
+            ImgSaves.write(str(PointList))
+            ImgSaves.write('\n')
+            ImgSaves.write(str(TriangleList))
+            ImgSaves.close()
+
+def Load():
+        Cont = False
+        ImgNames = open('Project\ImgSaves\ImgNames','r')
+        AllImgNames = []
+        for line in ImgNames:
+            correctline = line.replace('\n','')
+            AllImgNames.append(correctline)
+            if correctline == ImgSaveName.get():
+                Cont = True
+        ImgNames.close()
+
+        if Cont == True:
+            ImgSaveFullName = ImgSaveName.get()+".txt"
+            ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
+            ImgSaves = open(ImgPath,'r')
+            AllImgData = []
+            for line in ImgNames:
+                AllImgData.append(line)
+            ImgSaves.close()
+            
+
+ImgSave = Button(SideBar,text='Save',command = Save)
+ImgLoad = Button(SideBar,text='Load',command = Load)
+ImgSaveName = Entry(SideBar)
+ImgSave.pack()
+ImgLoad.pack()
+ImgSaveName.pack()
+
+ToolSelectedDispHeader = Label(SideBar, text = 'v Tool Selected v')
+ToolSelectedDisp = Label(SideBar, text='Warp')
+ToolSelectedDispHeader.pack()
+ToolSelectedDisp.pack()
+
+# Create Tool Selection Buttons
+def WarpSelectCom():
     global ToolSelected
-    if ToolSelected == 'Color':
-        ToolSelected = 'Warp'
-    else:
-        ToolSelected = 'Color'
-    
-ToolSwitch = Button(Win1, text='Switch Tools', command=ToolSelect)
-ToolSwitch.pack()
+    ToolSelected = 'Warp'
+    ToolSelectedDisp.config(text='Warp')
+def ColorSelectCom():
+    global ToolSelected
+    ToolSelected = 'Color'
+    ToolSelectedDisp.config(text='Color')
+def SelectColorCom():
+    global ToolSelected
+    ToolSelected = 'Color'
+    global ColorSelected
+    ColorSelected = (colorchooser.askcolor(title ="Choose color"))[0]
+    ToolSelectedDisp.config(text='Color')
+def EyedropSelectCom():
+    global ToolSelected
+    ToolSelected = 'Eyedrop'
+    ToolSelectedDisp.config(text='Eyedropper')
+
+# Undo Button
+def Undo():
+    global PointList
+    global TriangleList
+    PointList = LastPointList
+    TriangleList = LastTriangleList
+    DispImg = itk.PhotoImage(ImgRender())
+    DispBox.configure(image=DispImg)
+    DispBox.image=DispImg
+    DispBox.pack()
+
+ColorSelect = Button(SideBar, text='Color', command=ColorSelectCom)
+WarpSelect = Button(SideBar, text='Warp', command=WarpSelectCom)
+OpenColorSelect = Button(SideBar, text='Select Color', command=SelectColorCom)
+EyedropSelect = Button(SideBar, text='Eyedrop', command=EyedropSelectCom)
+UndoButton = Button(SideBar, text='Undo', command=Undo)
+UndoButton.pack()
+ColorSelect.pack()
+WarpSelect.pack()
+OpenColorSelect.pack()
+EyedropSelect.pack()
 
 # Make it Work
 Win1.mainloop()
+

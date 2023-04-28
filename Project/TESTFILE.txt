@@ -1,1 +1,0 @@
-ImgHeight;Imglength:Redval;Greval;Bluval;Size;Xcoord;Ycoord:Redval;Greval;Bluval;Size;Xcoord;Ycoord:Redval;Greval;Bluval;Size;Xcoord;Ycoord
