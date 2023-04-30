@@ -4,6 +4,7 @@ from tkinter.ttk import *
 from PIL import ImageTk as itk, Image, ImageDraw
 import copy
 import os
+import pickle
 
 FClickCo = [0,0]
 SClickCo = [0,0]
@@ -189,6 +190,14 @@ def ImgRender():
    
     return(NewIm)
 
+def ImgLoadFromSave(ImgSiz,TriangleList):
+    NewIm = Image.new("RGBA", ((ImgSiz*30),(ImgSiz*26)), color=(0,0,0))
+    ImgDraw = ImageDraw.Draw(NewIm)
+    for triangle in TriangleList:
+        ImgDraw.polygon((triangle[0]),(triangle[1]),outline=None)
+
+    return(NewIm)
+
 # Interface stuff
 
 # CLICKABLE FISH!!!!!
@@ -305,12 +314,15 @@ def Save():
             ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
             # assert os.path.isfile(ImgPath)
             AllImgData = (PointList,TriangleList)
-            ImgSaves = open(ImgPath,'w+')
-            ImgSaves.write(str(ImgSiz))
-            ImgSaves.write('\n')
-            ImgSaves.write(str(PointList))
-            ImgSaves.write('\n')
-            ImgSaves.write(str(TriangleList))
+            ImgSaves = open(ImgPath,'wb')
+            
+            # ImgSaves.write(str(ImgSiz))
+            # ImgSaves.write('\n')
+            # ImgSaves.write(str(TriangleList))
+            # ImgSaves.write('\n')
+            # ImgSaves.write(str(PointList))
+
+            pickle.dump([ImgSiz,TriangleList,PointList],ImgSaves)
             ImgSaves.close()
 
 def Load():
@@ -327,12 +339,22 @@ def Load():
         if Cont == True:
             ImgSaveFullName = ImgSaveName.get()+".txt"
             ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
-            ImgSaves = open(ImgPath,'r')
-            AllImgData = []
-            for line in ImgNames:
-                AllImgData.append(line)
+            ImgSaves = open(ImgPath,'rb')
+            AllImgData = pickle.load(ImgSaves)
+            # AllImgData = []
+            # for line in ImgSaves:
+            #     AllImgData.append(line)
             ImgSaves.close()
-            
+    
+            global PointList
+            global TriangleList
+            PointList = AllImgData[2]
+            TriangleList = AllImgData[1]
+
+            DispImg = itk.PhotoImage(ImgLoadFromSave(AllImgData[0],AllImgData[1]))
+            DispBox.configure(image=DispImg)
+            DispBox.image=DispImg
+            DispBox.pack()
 
 ImgSave = Button(SideBar,text='Save',command = Save)
 ImgLoad = Button(SideBar,text='Load',command = Load)
