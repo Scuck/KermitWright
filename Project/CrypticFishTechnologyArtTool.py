@@ -29,11 +29,6 @@ def CreImg (ImgSiz):
     global PointList
     TriangleList = []
     PointList = []
-    # Point list is a list of all points and all other points and triangles that those points are related to
-    # Triangle list is a list of all triangles and their color
-    # TID is Triangle ID, PID is point ID
-
-    # V Input to Triangle creation functions V
     if ImgSiz % 2 == 0:
         i=ImgSiz
         U = True
@@ -312,16 +307,8 @@ def Save():
 
             ImgSaveFullName = ImgSaveName.get()+".txt"
             ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
-            # assert os.path.isfile(ImgPath)
             AllImgData = (PointList,TriangleList)
             ImgSaves = open(ImgPath,'wb')
-            
-            # ImgSaves.write(str(ImgSiz))
-            # ImgSaves.write('\n')
-            # ImgSaves.write(str(TriangleList))
-            # ImgSaves.write('\n')
-            # ImgSaves.write(str(PointList))
-
             pickle.dump([ImgSiz,TriangleList,PointList],ImgSaves)
             ImgSaves.close()
 
@@ -341,9 +328,6 @@ def Load():
             ImgPath = os.path.join("Project\ImgSaves",ImgSaveFullName)
             ImgSaves = open(ImgPath,'rb')
             AllImgData = pickle.load(ImgSaves)
-            # AllImgData = []
-            # for line in ImgSaves:
-            #     AllImgData.append(line)
             ImgSaves.close()
     
             global PointList
