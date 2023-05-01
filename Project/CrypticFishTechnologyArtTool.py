@@ -13,7 +13,7 @@ ToolSelected = 'Warp'
 
 Win1 = Tk()
 Win1.geometry("800x800")
-Win1Lab = Label(text="V Image Goes Here V",foreground="purple")
+Win1Lab = Label(text="Cryptic Fish Technology Art Tool",foreground="purple")
 Win1Lab.pack()
 
 DefaultImgPil = Image.open(r"Project\Cryptotora.JPG")
